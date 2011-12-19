@@ -1,0 +1,236 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head profile="http://gmpg.org/xfn/11">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>Joyqi.com</title>
+<link rel="stylesheet" href="/static/style.css" type="text/css" media="screen" />
+<link rel="stylesheet" href="/static/white.css" type="text/css" media="screen" />
+
+<meta name="description" content="On the way ..." /> 
+<meta name="keywords" content="typecho,php,blog" /> 
+<meta name="generator" content="Typecho 0.8/10.8.15" /> 
+</head>
+
+<body>
+    <div id="header">
+        <div class="inside">
+            <div id="search">
+                <form method="get" id="sform">
+                    <div class="searchimg"></div>
+                    <input type="text" id="q" name="keyword" size="15" />
+                </form>
+
+            </div>
+
+            <h1><a href="https://joyqi.com/">Joyqi.com</a></h1>
+
+            <p class="description">On the way ...</p>
+
+
+
+            <div class="clear"></div>
+
+        </div>
+
+    </div>
+
+    <!-- [END] #header -->
+
+
+
+
+
+    <div id="primary" class="twocol-stories">
+
+        <div class="inside">
+
+            <div class="navigation">
+
+                <div class="alignleft">{% if prepage > 0 %}<a class="prev" href="/page/{{ prepage }}/">&laquo; Newer Entries</a>{% end %}</div>
+
+                <div class="alignright"><a class="next" title="" href="/page/{{ nextpage }}/">Older Entries &raquo;</a></div>
+
+            </div>
+
+            <div class="story first" id="post-263">
+
+                <h3><a href="https://joyqi.com/information-tech/use-comma-in-mysql-columns.html" rel="bookmark" title="Permanent Link to 在MySQL字段中使用逗号分隔符">在MySQL字段中使用逗号分隔符</a></h3>
+
+                <p>大多数开发者应该都遇到过在mysql字段中存储逗号分割字符串的经历，无论这些被分割的字段代表的是id还是tag，这个字段都应该具有如下几个共性。</p><ul>
+
+<li>被分割的字段一定是有限而且数量较少的，我们不可能在一个字符串中存储无限多个字符</li>
+
+<li>这个字段所属的表与这个字段关联的表，一定是一对多的关系</li>
+
+</ul><p>比如下面这个表结构所代表的content与tag这两个对象</p><pre class="bash">mysql<span style="color: #000000; font-weight: bold;">&gt;</span> SELECT <span style="color: #000000; font-weight: bold;">*</span> FROM content;
++----+------+
+<span style="color: #000000; font-weight: bold;">|</span> <span style="color: #c20cb9; font-weight: bold;">id</span> <span style="color: #000000; font-weight: bold;">|</span> tags <span style="color: #000000; font-weight: bold;">|</span> 
++----+------+
+<span style="color: #000000; font-weight: bold;">|</span>  1 <span style="color: #000000; font-weight: bold;">|</span> 1,2  <span style="color: #000000; font-weight: bold;">|</span> 
+<span style="color: #000000; font-weight: bold;">|</span>  2 <span style="color: #000000; font-weight: bold;">|</span> 2,3  <span style="color: #000000; font-weight: bold;">|</span> 
++----+------+
+2 rows <span style="color: #000000; font-weight: bold;">in</span> <span style="color: #000000; font-weight: bold;">set</span> <span style="color: #7a0874; font-weight: bold;">&#40;</span>0.01 sec<span style="color: #7a0874; font-weight: bold;">&#41;</span> 
+&nbsp;
+mysql<span style="color: #000000; font-weight: bold;">&gt;</span> SELECT <span style="color: #000000; font-weight: bold;">*</span> FROM tag;
++----+-------+
+<span style="color: #000000; font-weight: bold;">|</span> <span style="color: #c20cb9; font-weight: bold;">id</span> <span style="color: #000000; font-weight: bold;">|</span> name  <span style="color: #000000; font-weight: bold;">|</span> 
++----+-------+
+<span style="color: #000000; font-weight: bold;">|</span>  1 <span style="color: #000000; font-weight: bold;">|</span> php   <span style="color: #000000; font-weight: bold;">|</span> 
+<span style="color: #000000; font-weight: bold;">|</span>  2 <span style="color: #000000; font-weight: bold;">|</span> mysql <span style="color: #000000; font-weight: bold;">|</span> 
+<span style="color: #000000; font-weight: bold;">|</span>  3 <span style="color: #000000; font-weight: bold;">|</span> java  <span style="color: #000000; font-weight: bold;">|</span> 
++----+-------+
+3 rows <span style="color: #000000; font-weight: bold;">in</span> <span style="color: #000000; font-weight: bold;">set</span> <span style="color: #7a0874; font-weight: bold;">&#40;</span><span style="color: #000000;">0.00</span> sec<span style="color: #7a0874; font-weight: bold;">&#41;</span></pre><p class="more"><a href="https://joyqi.com/information-tech/use-comma-in-mysql-columns.html" title="在MySQL字段中使用逗号分隔符">Read the rest of this entry &raquo;</a></p>                        <div class="details">
+
+                            Posted at <span>Feb 23rd</span> <!-- by 混蛋70 -->| 9 comments | Filed Under: <a href="https://joyqi.com/category/information-tech/">信息技术探讨</a> <span class="read-on"><a href="https://joyqi.com/information-tech/use-comma-in-mysql-columns.html">read on</a></span>
+
+                        </div>
+
+                    </div>
+
+                                    <div class="story final" id="post-255">
+
+                        <h3><a href="https://joyqi.com/program/nginx-run-cgi.html" rel="bookmark" title="Permanent Link to 在nginx上运行cgi程序">在nginx上运行cgi程序</a></h3>
+
+                        <p>我们用到的很多开源程序比如mailman, nagios等等，都有WEB端管理界面。在那个Apache一家独大的年代，这个问题可以很好解决，因为apache本身可以运行cgi程序。但随着nginx服务器的大规模应用，而恰好nginx又没有cgi模块，所以我们不得不采用一些变通的手段来解决它。</p><p>在网上广为流传的解决方法是一个老外写的perl脚本，但这个脚本本身有很多问题，而且需要在后台启动一个守护进程，本人对用perl写的网络服务守护进程的稳定性很怀疑，在看了它的代码后，发现用PHP即可很好的解决这个问题。</p><p>首先我们要明白的是<strong>CGI其实本质上就是一个普通的二进制程序</strong>，你可以在后台直接运行它。而服务器要做的事就是将WEB传递的变量作为参数传递给这个程序并执行，而将执行返回的结果显示到页面上。</p><p>明白了这个道理，我们就可以开始着手解决这个问题了。其过程无非就是将PHP作为一个proxy，使其运行指定的程序，并把程序输出结果echo出来。</p><p>那么首先第一步，我们就需要把原来的cgi请求全部转发到指定的php上，这一点在nginx里用rewrite就可以很简单的做到。<strong>我们把这个PHP脚本命名为cgi.php</strong>，把它随便放到一个你认为合适的位置，然后用rewrite将后缀为cgi的请求都转发到cgi.php上。以下为参考的配置格式</p><p class="more"><a href="https://joyqi.com/program/nginx-run-cgi.html" title="在nginx上运行cgi程序">Read the rest of this entry &raquo;</a></p>                     <div class="details">
+
+                            Posted at <span>Jul 22nd</span> <!-- by 混蛋70 -->| 9 comments | Filed Under: <a href="https://joyqi.com/category/program/">编程开发</a> <span class="read-on"><a href="https://joyqi.com/program/nginx-run-cgi.html">read on</a></span>
+
+                        </div>
+
+                    </div>
+
+                        </div>
+
+                
+
+                            
+
+            <div class="clear"></div>
+
+    </div>
+
+    <!-- [END] #primary -->
+
+
+
+
+
+
+
+<hr class="hide" />
+
+    <div id="ancillary">
+
+        <div class="inside">
+
+            <div class="block first">
+
+
+
+                <h2>About</h2>
+
+                                                <p>Name:祁宁(Qi Ning)<br /> 
+MSN:qining-china#hotmail.com<br /> 
+G-talk:magike.net#gmail.com</p><h2>Projects</h2><ul>
+
+<li><a href="http://code.google.com/p/magike">Magike</a></li>
+
+<li><a href="http://code.google.com/p/typecho">Typecho</a></li>
+
+<li><a href="https://joyqi.com/SciTePHPSuit">ScitePHPSuit</a></li>
+
+</ul>               
+
+            </div>
+
+            
+
+            <div class="block">
+
+
+
+                <h2>Recently</h2>
+
+                <ul class="dates">
+
+                                                            <li><a href="https://joyqi.com/information-tech/use-comma-in-mysql-columns.html"><span class="date">02.23</span> 在MySQL字段中使用逗号分隔符 </a></li>
+
+                                        <li><a href="https://joyqi.com/program/nginx-run-cgi.html"><span class="date">07.22</span> 在nginx上运行cgi程序 </a></li>
+
+                                        <li><a href="https://joyqi.com/information-tech/google-code-transmit-typecho.html"><span class="date">06.24</span> 为诸位离线控准备的Google Code同步插件 </a></li>
+
+                                        <li><a href="https://joyqi.com/picture-show/tamron-1750-test.html"><span class="date">05.21</span> 腾龙17-50(vc)试拍 </a></li>
+
+                                        <li><a href="https://joyqi.com/picture-show/243.html"><span class="date">04.30</span> 买了个相机 </a></li>
+
+                                        <li><a href="https://joyqi.com/funny-stuff/my-headphone.html"><span class="date">03.14</span> 我听过的耳机们 </a></li>
+
+                                        <li><a href="https://joyqi.com/life/heros-of-newearth.html"><span class="date">10.18</span> Heroes of Newerth,Dota迷不可错过的游戏 </a></li>
+
+                                        <li><a href="https://joyqi.com/life/move-to-mediatemple.html"><span class="date">10.14</span> 我们换到了MT </a></li>
+
+                                        <li><a href="https://joyqi.com/funny-stuff/action.html"><span class="date">06.17</span> scite-ru，无意中发现的奇葩 </a></li>
+
+                                        <li><a href="https://joyqi.com/life/some-books.html"><span class="date">06.08</span> 看了几本书 </a></li>
+
+                                    </ul>
+
+
+
+            </div>
+
+            
+
+            <div class="block final">
+
+                <h2>Categories</h2>
+
+                <ul class="counts">
+
+                    <li><a href="https://joyqi.com/category/life/">精彩生活</a> (14)</li> 
+<li><a href="https://joyqi.com/category/funny-stuff/">有趣的玩意</a> (12)</li> 
+<li><a href="https://joyqi.com/category/information-tech/">信息技术探讨</a> (37)</li> 
+<li><a href="https://joyqi.com/category/beauty/">那些花儿</a> (9)</li> 
+<li><a href="https://joyqi.com/category/picture-show/">看图要说话 </a> (5)</li> 
+<li><a href="https://joyqi.com/category/program/">编程开发</a> (1)</li> 
+                </ul>
+
+
+
+            </div>
+
+            
+
+            <div class="clear"></div>
+
+        </div>
+
+    </div>
+
+    <!-- [END] #ancillary -->   
+
+
+
+<hr class="hide" />
+
+    <div id="footer">
+
+        <div class="inside">
+
+                        <p class="copyright"> Powered by <a href="http://warpspire.com/hemingway">Hemingway</a> <a href="http://notes.xiaoka.com/hemingway/">2.5</a> flavored <a href="http://typecho.org">Typecho</a>.</p>
+
+            <p class="attributes"><a href="feed:https://joyqi.com/feed/">Entries RSS</a> <a href="feed:https://joyqi.com/feed/comments/">Comments RSS</a></p>
+
+        </div>
+
+    </div>
+
+    <!-- [END] #footer -->  
+
+
+
+</body>
+
+</html>
