@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head profile="http://gmpg.org/xfn/11">
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<title>Joyqi.com</title>
+<title>Oo.xx</title>
 <link rel="stylesheet" href="/static/style.css" type="text/css" media="screen" />
 <link rel="stylesheet" href="/static/white.css" type="text/css" media="screen" />
 
@@ -24,7 +24,7 @@
 
             </div>
 
-            <h1><a href="https://joyqi.com/">Joyqi.com</a></h1>
+            <h1><a href="/">Oo.xx</a></h1>
 
             <p class="description">On the way ...</p>
 
@@ -41,7 +41,6 @@
 
 
 
-
     <div id="primary" class="twocol-stories">
 
         <div class="inside">
@@ -53,10 +52,10 @@
                 <div class="alignright"><a class="next" title="" href="/page/{{ nextpage }}/">Older Entries &raquo;</a></div>
 
             </div>
+{% for i, entry in enumerate(entries) %}
+            <div class="story {% if i == 0 %}first{% else %}final{% end %}" id="post-{{ entry.cid }}">
 
-            <div class="story first" id="post-263">
-
-                <h3><a href="https://joyqi.com/information-tech/use-comma-in-mysql-columns.html" rel="bookmark" title="Permanent Link to 在MySQL字段中使用逗号分隔符">在MySQL字段中使用逗号分隔符</a></h3>
+                <h3><a href="/entry/{{ entry.slug }}" rel="bookmark" title="Permanent Link to {{ escape(entry.title) }}">{{ escape(entry.title) }}</a></h3>
 
                 <p>大多数开发者应该都遇到过在mysql字段中存储逗号分割字符串的经历，无论这些被分割的字段代表的是id还是tag，这个字段都应该具有如下几个共性。</p><ul>
 
@@ -83,23 +82,12 @@ mysql<span style="color: #000000; font-weight: bold;">&gt;</span> SELECT <span s
 +----+-------+
 3 rows <span style="color: #000000; font-weight: bold;">in</span> <span style="color: #000000; font-weight: bold;">set</span> <span style="color: #7a0874; font-weight: bold;">&#40;</span><span style="color: #000000;">0.00</span> sec<span style="color: #7a0874; font-weight: bold;">&#41;</span></pre><p class="more"><a href="https://joyqi.com/information-tech/use-comma-in-mysql-columns.html" title="在MySQL字段中使用逗号分隔符">Read the rest of this entry &raquo;</a></p>                        <div class="details">
 
-                            Posted at <span>Feb 23rd</span> <!-- by 混蛋70 -->| 9 comments | Filed Under: <a href="https://joyqi.com/category/information-tech/">信息技术探讨</a> <span class="read-on"><a href="https://joyqi.com/information-tech/use-comma-in-mysql-columns.html">read on</a></span>
+                            Posted at <span>{{ locale.format_date(entry.created) }}</span> <!-- by 混蛋70 -->| 9 comments | Filed Under: <a href="https://joyqi.com/category/information-tech/">信息技术探讨</a> <span class="read-on"><a href="/entry/{{ entry.slug }}">read on</a></span>
 
                         </div>
 
                     </div>
-
-                                    <div class="story final" id="post-255">
-
-                        <h3><a href="https://joyqi.com/program/nginx-run-cgi.html" rel="bookmark" title="Permanent Link to 在nginx上运行cgi程序">在nginx上运行cgi程序</a></h3>
-
-                        <p>我们用到的很多开源程序比如mailman, nagios等等，都有WEB端管理界面。在那个Apache一家独大的年代，这个问题可以很好解决，因为apache本身可以运行cgi程序。但随着nginx服务器的大规模应用，而恰好nginx又没有cgi模块，所以我们不得不采用一些变通的手段来解决它。</p><p>在网上广为流传的解决方法是一个老外写的perl脚本，但这个脚本本身有很多问题，而且需要在后台启动一个守护进程，本人对用perl写的网络服务守护进程的稳定性很怀疑，在看了它的代码后，发现用PHP即可很好的解决这个问题。</p><p>首先我们要明白的是<strong>CGI其实本质上就是一个普通的二进制程序</strong>，你可以在后台直接运行它。而服务器要做的事就是将WEB传递的变量作为参数传递给这个程序并执行，而将执行返回的结果显示到页面上。</p><p>明白了这个道理，我们就可以开始着手解决这个问题了。其过程无非就是将PHP作为一个proxy，使其运行指定的程序，并把程序输出结果echo出来。</p><p>那么首先第一步，我们就需要把原来的cgi请求全部转发到指定的php上，这一点在nginx里用rewrite就可以很简单的做到。<strong>我们把这个PHP脚本命名为cgi.php</strong>，把它随便放到一个你认为合适的位置，然后用rewrite将后缀为cgi的请求都转发到cgi.php上。以下为参考的配置格式</p><p class="more"><a href="https://joyqi.com/program/nginx-run-cgi.html" title="在nginx上运行cgi程序">Read the rest of this entry &raquo;</a></p>                     <div class="details">
-
-                            Posted at <span>Jul 22nd</span> <!-- by 混蛋70 -->| 9 comments | Filed Under: <a href="https://joyqi.com/category/program/">编程开发</a> <span class="read-on"><a href="https://joyqi.com/program/nginx-run-cgi.html">read on</a></span>
-
-                        </div>
-
-                    </div>
+ {% end %}
 
                         </div>
 

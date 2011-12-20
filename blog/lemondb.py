@@ -120,9 +120,9 @@ class Row(dict):
 if __name__ == '__main__':
 	#db = connect("sqlite", db="e:/sqlite/blog.db")
 	db = connect("mysql", host="localhost", user="root", passwd="", db="news")
-	result = db.get("select * from entries where title like %s", False, '%df%')
+	db2 = connect("mysql", host="211.144.137.66", user="lemon", passwd="lemon001)(", db="wp")
+	
+	result = db2.get("select count(*) from wp_posts")
 	print result
-	print 'result["slug"] : %s' % result["slug"]
-	print 'result.slug : %s' % result.slug
 	#result = db.execute("insert into entries(id, title) values(%s, %s)", 5, 'test');
 	#print result

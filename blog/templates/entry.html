@@ -4,13 +4,13 @@
 
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 
-<title>Joyqi.com &raquo; 在MySQL字段中使用逗号分隔符</title>
+<title>Oo.xx &raquo; {{ escape(entry.title) }}</title>
 
 <link rel="stylesheet" href="/static/style.css" type="text/css" media="screen" />
 <link rel="stylesheet" href="/static/white.css" type="text/css" media="screen" />
 
 
-<meta name="description" content="大多数开发者应该都遇到过在mysql字段中存储逗号分割字符串的经历，无论这些被分割的字段代表的是id还是tag，这个字段都应该具有如下几个共性。被分割的字段一定是有限而且数量较少的，我们不..." /> 
+<meta name="description" content="{{ escape(entry.title) }}..." /> 
 <meta name="keywords" content="php,MySQL" /> 
 <meta name="generator" content="Typecho 0.8/10.8.15" /> 
 </head>
@@ -35,7 +35,7 @@
 
             
 
-            <h1><a href="https://joyqi.com/">Joyqi.com</a></h1>
+            <h1><a href="/">Oo.xx</a></h1>
 
             <p class="description">On the way ...</p>
 
@@ -49,48 +49,16 @@
 
     <!-- [END] #header -->
 
-
-
+{% import markdown %}
     <div id="primary" class="single-post">
 
         <div class="inside" id="post-263">
 
-                        <div class="primary">
+               <div class="primary">
 
-                <h1>在MySQL字段中使用逗号分隔符</h1>
-
-                <p>大多数开发者应该都遇到过在mysql字段中存储逗号分割字符串的经历，无论这些被分割的字段代表的是id还是tag，这个字段都应该具有如下几个共性。</p><ul>
-
-<li>被分割的字段一定是有限而且数量较少的，我们不可能在一个字符串中存储无限多个字符</li>
-
-<li>这个字段所属的表与这个字段关联的表，一定是一对多的关系</li>
-
-</ul><p>比如下面这个表结构所代表的content与tag这两个对象</p><pre class="bash">mysql<span style="color: #000000; font-weight: bold;">&gt;</span> SELECT <span style="color: #000000; font-weight: bold;">*</span> FROM content;
-+----+------+
-<span style="color: #000000; font-weight: bold;">|</span> <span style="color: #c20cb9; font-weight: bold;">id</span> <span style="color: #000000; font-weight: bold;">|</span> tags <span style="color: #000000; font-weight: bold;">|</span> 
-+----+------+
-<span style="color: #000000; font-weight: bold;">|</span>  1 <span style="color: #000000; font-weight: bold;">|</span> 1,2  <span style="color: #000000; font-weight: bold;">|</span> 
-<span style="color: #000000; font-weight: bold;">|</span>  2 <span style="color: #000000; font-weight: bold;">|</span> 2,3  <span style="color: #000000; font-weight: bold;">|</span> 
-+----+------+
-2 rows <span style="color: #000000; font-weight: bold;">in</span> <span style="color: #000000; font-weight: bold;">set</span> <span style="color: #7a0874; font-weight: bold;">&#40;</span>0.01 sec<span style="color: #7a0874; font-weight: bold;">&#41;</span> 
-&nbsp;
-mysql<span style="color: #000000; font-weight: bold;">&gt;</span> SELECT <span style="color: #000000; font-weight: bold;">*</span> FROM tag;
-+----+-------+
-<span style="color: #000000; font-weight: bold;">|</span> <span style="color: #c20cb9; font-weight: bold;">id</span> <span style="color: #000000; font-weight: bold;">|</span> name  <span style="color: #000000; font-weight: bold;">|</span> 
-+----+-------+
-<span style="color: #000000; font-weight: bold;">|</span>  1 <span style="color: #000000; font-weight: bold;">|</span> php   <span style="color: #000000; font-weight: bold;">|</span> 
-<span style="color: #000000; font-weight: bold;">|</span>  2 <span style="color: #000000; font-weight: bold;">|</span> mysql <span style="color: #000000; font-weight: bold;">|</span> 
-<span style="color: #000000; font-weight: bold;">|</span>  3 <span style="color: #000000; font-weight: bold;">|</span> java  <span style="color: #000000; font-weight: bold;">|</span> 
-+----+-------+
-3 rows <span style="color: #000000; font-weight: bold;">in</span> <span style="color: #000000; font-weight: bold;">set</span> <span style="color: #7a0874; font-weight: bold;">&#40;</span><span style="color: #000000;">0.00</span> sec<span style="color: #7a0874; font-weight: bold;">&#41;</span></pre><p><!--more--></p><p>这些原则问题，相信大家在开发过程中已经很熟悉了。<strong>但是你在使用这种方法来处理实际问题时，内心一定还是有些许忐忑，因为这种方法或多或少看上去有点像野路子</strong>。在那本厚厚的《数据库》教材中，也没有提到这种设计方法，标准的方法似乎是应该使用一个关系映射表在这两个表之间插一杠子，尽管这样会使用效率低下的连接查询。</p><p>每个开发者都曾纠结于标准与效率，但我想我们的努力能使这种方法的使用看起来更加标准。注意，以下讨论的使用方法仅限于mysql，但其它数据库应该可以移植。</p><h3>相关性检索</h3><p>很多开发者还在使用古老的LIKE方法来实现相关性检索，比如上面那个数据库结构中，content表中的两条记录都有2这个tag，那么怎样在我取出记录1时，把与它tag相关的记录也显示出来呢。其实这也是CMS需要面对的一个基本问题，也就是相关内容的查询。</p><p>如果你是一个菜鸟，你可能只会想到LIKE方法，比如先把记录1取出来，然后再把tags字段按逗号分割，最后做一个循环用LIKE检索content表中所有tags字段中包含2的记录，类似这样</p><pre class="sql"><span style="color: #993333; font-weight: bold;">SELECT</span> <span style="color: #66cc66;">*</span> <span style="color: #993333; font-weight: bold;">FROM</span> content <span style="color: #993333; font-weight: bold;">WHERE</span> tag <span style="color: #993333; font-weight: bold;">LIKE</span> <span style="color: #ff0000;">'%2%'</span> <span style="color: #993333; font-weight: bold;">AND</span> id <span style="color: #66cc66;">&lt;&gt;</span> <span style="color: #cc66cc;">1</span></pre><p>但这种方法实在是太慢了，查询次数多不说，LIKE查询本来就是一个比较慢的方法。而且你还要处理前后逗号的问题，总之麻烦是一大堆。</p><p>所以让我们静下心来翻翻mysql手册，看看有没有什么惊喜。这个时候，一个名为<strong>FIND_IN_SET</strong>的函数，会闪着金光映入你的眼帘。让我们看看这个函数的定义</p><blockquote><p>FIND_IN_SET(str,strlist)</p><p>Returns a value in the range of 1 to N if the string str is in the string list strlist consisting of N substrings. A string list is a string composed of substrings separated by “,” characters. If the first argument is a constant string and the second is a column of type SET, the FIND_IN_SET() function is optimized to use bit arithmetic. Returns 0 if str is not in strlist or if strlist is the empty string. Returns NULL if either argument is NULL. This function does not work properly if the first argument contains a comma (“,”) character.</p></blockquote><p>哦，PERFECT! 简单说来就是寻找一个字符串是否在另一个以逗号分割的字符串中存在的函数，这简直是为我们量身定做的。那么我们的sql就变成</p><pre class="sql"><span style="color: #993333; font-weight: bold;">SELECT</span> <span style="color: #66cc66;">*</span> <span style="color: #993333; font-weight: bold;">FROM</span> content <span style="color: #993333; font-weight: bold;">WHERE</span> FIND_IN_SET<span style="color: #66cc66;">&#40;</span><span style="color: #ff0000;">'2'</span><span style="color: #66cc66;">,</span> tags<span style="color: #66cc66;">&#41;</span> <span style="color: #993333; font-weight: bold;">AND</span> id <span style="color: #66cc66;">&lt;&gt;</span> <span style="color: #cc66cc;">1</span></pre><p>在翻这些函数的过程中，你应该已经深深地体会到mysql的设计者对以逗号分割存储字段方法的肯定，因为有很多方法就是设计用来处理这种问题的。</p><p>这样看起来好多了，一切似乎完美了，是这样吗？其实还没有，如果你的tag比较多，你需要创建多个sql语句，而且有的记录关联的tag比较多，有的比较少，怎么能按照相关性进行排列呢。</p><p>这个时候，你可以关注mysql的全文检索功能。这个词你肯定看见过无数回了，但是这么使用的肯定很少，让我们直接看语句吧</p><pre class="sql"><span style="color: #993333; font-weight: bold;">SELECT</span> <span style="color: #66cc66;">*</span> <span style="color: #993333; font-weight: bold;">FROM</span> content <span style="color: #993333; font-weight: bold;">WHERE</span> MATCH<span style="color: #66cc66;">&#40;</span>tags<span style="color: #66cc66;">&#41;</span> AGAINST<span style="color: #66cc66;">&#40;</span><span style="color: #ff0000;">'1,2'</span><span style="color: #66cc66;">&#41;</span> <span style="color: #993333; font-weight: bold;">AND</span> id <span style="color: #66cc66;">&lt;&gt;</span> <span style="color: #cc66cc;">1</span></pre><p>这个语句的优势是显而易见的，你不需要对tags字段做再次分割。那么这种查询的原理是什么呢，稍微了解下MATCH AGAINST的用法就知道，全文检索的默认分隔符是标点符号和stopwords，其中前者正是我们需要的特性。全文检索按照逗号将MATCH和AGAINST里的字符串做分割，然后将它们匹配。</p><p>需要注意的是上面sql仅仅是个例子，如果你直接这么执行，是无法得到任何结果的。原因在以下</p><ol>
-
-<li>你需要对tags字段建立fulltext索引（如果仅仅是测试，可以不做，建索引只是提高性能，对结果没有影响）</li>
-
-<li><strong>每个被标点符号分割的word长度必须在3个字符以上</strong>，这才是关键，我们的tag id太短了，会被自动忽略掉，这个时候你可以考虑让id从一个比较大值开始自增，比如1000，这样它就够长了。</li>
-
-<li>你撞到了stopwords，比如你的tags字段是这样的'hello,nobody'，nobody是mysql的一个默认的stop words，它会被自动忽略。stop words是英文中的一些无意义词，搜索的时候不需要它们，类似汉语中的助词等等。但在我们的使用中显然不是用来做搜索的，因此可以在my.cnf文件里，加上<strong>ft_stopword_file=''</strong>来禁用它</li>
-
-</ol><p>随着WEB技术的发展，相关搜索走SQL的情况越来越少，很多时候只需要用搜索引擎就可以了。但本文的目的并不只是讨论这种方法，而是体现实现这一结果的过程。</p>         </div>
+                   <h1>{{ escape(entry.title) }}</h1>
+                   {{ markdown.markdown(entry.text) }}
+                </div>
 
             <hr class="hide" />
 
@@ -114,7 +82,7 @@ mysql<span style="color: #000000; font-weight: bold;">&gt;</span> SELECT <span s
 
                             <div class="comment-head">
 
-                    <h2>9 Comments</h2>
+                    <h2>{{ entry.commentsNum }} Comments</h2>
 
                     <span class="details"><a href="#comment-form">Jump to comment form</a> | <a href="https://joyqi.com/feed/information-tech/use-comma-in-mysql-columns.html">comments feed</a> | <a href="https://joyqi.com/information-tech/use-comma-in-mysql-columns.html/trackback">trackback uri</a></span>
 

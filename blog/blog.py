@@ -10,7 +10,7 @@ import tornado.ioloop
 import tornado.options
 import tornado.web
 import unicodedata
-
+import urllib
 import lemondb
 from tornado.options import define, options
 
@@ -28,8 +28,10 @@ class Application(tornado.web.Application):
 			(r"/", HomeHandler),
 			(r"/page/(\d+)/?", HomeHandler),
 			(r"/category/([^/]+)/?", CategoryHandler),
-			(r"/entry/([^/]+)", EntryHandler),
+			(r"/category/([^/]+)/(\d+)?/?", CategoryHandler),
 			(r"/search/([^/]+)/?", SearchHandler),
+			(r"/search/([^/]+)/(\d+)?/?", SearchHandler),
+			(r"/entry/([^/]+)", EntryHandler),
 			(r"/feed", FeedHandler),
 			(r"/compose", ComposeHandler),
 			(r"/auth/login", AuthLoginHandler),
@@ -45,7 +47,7 @@ class Application(tornado.web.Application):
 			login_url="/auth/login",
 		)
 		tornado.web.Application.__init__(self, handlers, **settings)
-		self.db = lemondb.connect("mysql", host="localhost", user="root", passwd="", db="blog")
+		self.db = lemondb.connect("mysql", host="localhost", user="root", passwd="", db="blog", charset="utf8")
 
 
 class BaseHandler(tornado.web.RequestHandler):
@@ -70,29 +72,41 @@ class HomeHandler(BaseHandler):
 		if page < 1:
 			page = 1
 		start = (page-1)*pagesize
-		entries = self.db.query("SELECT * FROM typecho_contents ORDER BY modified "
+		entries = self.db.query("SELECT * FROM typecho_contents where status = 'publish' ORDER BY modified "
 								"DESC LIMIT %s, %s", start, pagesize)
-		
-		self.render("index.html", entries=entries, nextpage=page+1, prepage=page-1)
+		print entries
+		self.render("index.html", entries=entries, nextpage=page+1, prepage=page-1, pagetype="page")
 
 
 class EntryHandler(BaseHandler):
 	def get(self, slug):
-		entry = self.db.get("SELECT * FROM typecho_contents WHERE cid = %s", False, slug)
+		slug = urllib.quote(slug)
+		entry = self.db.get("SELECT * FROM typecho_contents WHERE slug = %s and status = 'publish'", False, slug)
 		if not entry: 
 			raise tornado.web.HTTPError(404)
-		self.render("entry.html", entry=entry)
+		self.render("entry.html", entry=entry,autoescape=None)
 
 
 class CategoryHandler(BaseHandler):
-	def get(self, mid):
-		entries = self.db.query("SELECT * FROM typecho_contents a, typecho_relationships b where a.cid = b.cid and b.mid = %s ORDER BY modified DESC", mid)
-		self.render("index.html", entries=entries)
+	def get(self, slug, page=1):
+		mid = self.db.get("select mid from typecho_metas where slug = %s", slug)
+		pagesize = 2
+		page = int(page)
+		if page < 1:
+			page = 1
+		start = (page-1)*pagesize
+		entries = self.db.query("SELECT * FROM typecho_contents a, typecho_relationships b where a.cid = b.cid and b.mid = %s and a.status = 'publish' ORDER BY modified DESC LIMIT %s, %s", mid, start, pagesize)
+		self.render("index.html", entries=entries, nextpage=page+1, prepage=page-1, pagetype="category")
 
 class SearchHandler(BaseHandler):
-	def get(self, keyword):
-		entries = self.db.query("SELECT * FROM typecho_contents where title like %s ORDER BY modified DESC", "%"+keyword+"%")
-		self.render("index.html", entries=entries)
+	def get(self, keyword, page=1):
+		pagesize = 2
+		page = int(page)
+		if page < 1:
+			page = 1
+		start = (page-1)*pagesize
+		entries = self.db.query("SELECT * FROM typecho_contents where title like %s ORDER BY modified DESC LIMIT %s, %s", "%"+keyword+"%", start, pagesize)
+		self.render("index.html", entries=entries, nextpage=page+1, prepage=page-1, pagetype="search")
 
 class FeedHandler(BaseHandler):
 	def get(self):
