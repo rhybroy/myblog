@@ -19,10 +19,7 @@ background:#E5E5E5;
 background:#E5E5E5;
 }
 
-code {
-display: block; border: 1px solid #AAAAAA; background: #F1ECDD; color: #000; line-height: 16px;
-         font-family: 'andale mono','lucida console',monospace; font-size: 12px; padding: 10px; margin: 10px 0;
-}
+
 
 a, .story .details a, .story .details a:hover{
 color:#000;

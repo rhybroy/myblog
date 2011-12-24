@@ -50,13 +50,29 @@ class LemonDB(object):
 		finally:
 			self.close()
 
-	def get(self, query, enforce=False, *parameters):
+	def get(self, query, *parameters):
 		"""Returns the first row returned for the given query."""
 		rows = self.query(query, *parameters)
 		if not rows:
 			return None
 		else:
-			if enforce and len(rows) > 1:
+			return rows[0]
+		
+	def checkExist(self, query, *parameters):
+		"""Returns the first row returned for the given query."""
+		rows = self.query(query, *parameters)
+		if not rows:
+			return False
+		else:
+			return True
+			
+	def getone(self, query, *parameters):
+		"""Returns the first row returned for the given query."""
+		rows = self.query(query, *parameters)
+		if not rows:
+			return None
+		else:
+			if len(rows) > 1:
 				raise Exception("Multiple rows returned for Database.get() query")
 			else:
 				return rows[0]

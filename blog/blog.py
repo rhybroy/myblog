@@ -4,7 +4,6 @@ import os.path
 import re
 import tornado.auth
 #import tornado.database
-import sqlite3
 import tornado.httpserver
 import tornado.ioloop
 import tornado.options
@@ -12,6 +11,7 @@ import tornado.web
 import unicodedata
 import urllib
 import lemondb
+import markdown2
 from tornado.options import define, options
 
 define("port", default=8888, help="run on the given port", type=int)
@@ -72,31 +72,45 @@ class HomeHandler(BaseHandler):
 		if page < 1:
 			page = 1
 		start = (page-1)*pagesize
-		entries = self.db.query("SELECT * FROM typecho_contents where status = 'publish' ORDER BY modified "
+		entries = self.db.query("SELECT a.*, c.name as category, c.slug as cslug FROM typecho_contents a, typecho_relationships b, typecho_metas c where a.status = 'publish' and a.cid = b.cid and b.mid = c.mid ORDER BY a.created "
 								"DESC LIMIT %s, %s", start, pagesize)
-		print entries
-		self.render("index.html", entries=entries, nextpage=page+1, prepage=page-1, pagetype="page")
+		
+		categorys = self.db.query("select * from typecho_metas where type='category' order by `order`")
+		recentlys = self.db.query("select title, slug, created from typecho_contents order by created desc limit 10")
+		
+		self.render("index.html", autoescape=None, entries=entries, nextpage=page+1, prepage=page-1, pagetype="page", categorys=categorys, recentlys=recentlys)
 
 
 class EntryHandler(BaseHandler):
 	def get(self, slug):
 		slug = urllib.quote(slug)
-		entry = self.db.get("SELECT * FROM typecho_contents WHERE slug = %s and status = 'publish'", False, slug)
+		entry = self.db.get("SELECT * FROM typecho_contents WHERE slug = %s and status = 'publish'", slug)
 		if not entry: 
 			raise tornado.web.HTTPError(404)
-		self.render("entry.html", entry=entry,autoescape=None)
+		
+		comments = self.db.query("select * from typecho_comments where cid = %s order by created", entry.cid)
+		
+		categorys = self.db.query("select * from typecho_metas where type='category' order by `order`")
+		recentlys = self.db.query("select title, slug, created from typecho_contents order by created desc limit 10")
+		
+		self.render("entry.html", entry=entry, comments=comments, autoescape=None, categorys=categorys, recentlys=recentlys)
 
 
 class CategoryHandler(BaseHandler):
 	def get(self, slug, page=1):
-		mid = self.db.get("select mid from typecho_metas where slug = %s", slug)
+		slug = urllib.quote(slug)
+		mid = self.db.get("select mid from typecho_metas where slug = %s", slug).mid
 		pagesize = 2
 		page = int(page)
 		if page < 1:
 			page = 1
 		start = (page-1)*pagesize
-		entries = self.db.query("SELECT * FROM typecho_contents a, typecho_relationships b where a.cid = b.cid and b.mid = %s and a.status = 'publish' ORDER BY modified DESC LIMIT %s, %s", mid, start, pagesize)
-		self.render("index.html", entries=entries, nextpage=page+1, prepage=page-1, pagetype="category")
+		entries = self.db.query("SELECT a.*, c.name as category, c.slug as cslug FROM typecho_contents a, typecho_relationships b, typecho_metas c where a.cid = b.cid and b.mid = c.mid and b.mid = %s and a.status = 'publish' ORDER BY created DESC LIMIT %s, %s", mid, start, pagesize)
+		
+		categorys = self.db.query("select * from typecho_metas where type='category' order by `order`")
+		recentlys = self.db.query("select title, slug, created from typecho_contents order by created desc limit 10")
+		
+		self.render("index.html", entries=entries, nextpage=page+1, prepage=page-1, pagetype="category/%s"%slug, categorys=categorys, recentlys=recentlys)
 
 class SearchHandler(BaseHandler):
 	def get(self, keyword, page=1):
@@ -105,8 +119,12 @@ class SearchHandler(BaseHandler):
 		if page < 1:
 			page = 1
 		start = (page-1)*pagesize
-		entries = self.db.query("SELECT * FROM typecho_contents where title like %s ORDER BY modified DESC LIMIT %s, %s", "%"+keyword+"%", start, pagesize)
-		self.render("index.html", entries=entries, nextpage=page+1, prepage=page-1, pagetype="search")
+		entries = self.db.query("SELECT a.*, c.name as category, c.slug as cslug FROM typecho_contents a, typecho_relationships b, typecho_metas c where a.cid = b.cid and b.mid = c.mid and a.title like %s ORDER BY a.created DESC LIMIT %s, %s", "%"+keyword+"%", start, pagesize)
+		
+		categorys = self.db.query("select * from typecho_metas where type='category' order by `order`")
+		recentlys = self.db.query("select title, slug, created from typecho_contents order by created desc limit 10")
+		
+		self.render("index.html", entries=entries, nextpage=page+1, prepage=page-1, pagetype="search/%s"%keyword, categorys=categorys, recentlys=recentlys)
 
 class FeedHandler(BaseHandler):
 	def get(self):
@@ -117,41 +135,40 @@ class FeedHandler(BaseHandler):
 
 
 class ComposeHandler(BaseHandler):
-	@tornado.web.authenticated
 	def get(self):
 		id = self.get_argument("id", None)
 		entry = None
 		if id:
-			entry = self.db.get("SELECT * FROM entries WHERE id = %s", int(id))
-		self.render("compose.html", entry=entry)
+			entry = self.db.get("SELECT * FROM typecho_contents WHERE cid = %s", int(id))
+		self.render("editor.html", entry=entry)
 
-	@tornado.web.authenticated
 	def post(self):
 		id = self.get_argument("id", None)
 		title = self.get_argument("title")
 		text = self.get_argument("markdown")
-		html = markdown.markdown(text)
+		html = markdown2.markdown(text)
 		if id:
-			entry = self.db.get("SELECT * FROM entries WHERE id = %s", int(id))
-			if not entry: raise tornado.web.HTTPError(404)
-			slug = entry.slug
+			entryBL = self.db.checkExist("SELECT cid FROM typecho_contents WHERE cid = %s", int(id))
+			if not entryBL: 
+				raise tornado.web.HTTPError(404)
+			slug = urllib.quote_plus(title.encode("utf-8")).lower().strip()
 			self.db.execute(
-				"UPDATE entries SET title = %s, markdown = %s, html = %s "
-				"WHERE id = %s", title, text, html, int(id))
+				"UPDATE typecho_contents SET title = %s, slug = %s, markdown = %s, html = %s, modified=now() "
+				"WHERE cid = %s", title, slug, text, html, int(id))
 		else:
-			slug = unicodedata.normalize("NFKD", title).encode(
-				"ascii", "ignore")
-			slug = re.sub(r"[^\w]+", " ", slug)
-			slug = "-".join(slug.lower().strip().split())
-			if not slug: slug = "entry"
+			slug = urllib.quote_plus(title.encode("utf-8")).lower().strip()
+			
+			if not slug: 
+				slug = "entry"
 			while True:
-				e = self.db.get("SELECT * FROM entries WHERE slug = %s", slug)
-				if not e: break
+				e = self.db.get("SELECT * FROM typecho_contents WHERE slug = %s", slug)
+				if not e: 
+					break
 				slug += "-2"
 			self.db.execute(
-				"INSERT INTO entries (author_id,title,slug,markdown,html,"
-				"published) VALUES (%s,%s,%s,%s,%s,UTC_TIMESTAMP())",
-				self.current_user.id, title, slug, text, html)
+				"INSERT INTO typecho_contents (authorId,title,slug,markdown,html,"
+				"created) VALUES (%s,%s,%s,%s,%s,now())",
+				1, title, slug, text, html)
 		self.redirect("/entry/" + slug)
 
 

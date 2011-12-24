@@ -8,298 +8,144 @@
 
 <link rel="stylesheet" href="/static/style.css" type="text/css" media="screen" />
 <link rel="stylesheet" href="/static/white.css" type="text/css" media="screen" />
-
+<link rel="stylesheet" href="/static/prettify/sunburst.css" type="text/css" />
+<script type="text/javascript" src="/static/prettify/prettify.js"></script>
 
 <meta name="description" content="{{ escape(entry.title) }}..." /> 
 <meta name="keywords" content="php,MySQL" /> 
 <meta name="generator" content="Typecho 0.8/10.8.15" /> 
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js" type="text/javascript"></script>
+<script type="text/javascript">
+	function styleCode() {
+		if (typeof disableStyleCode != "undefined") {
+			return;
+		}
+
+		var a = false;
+		var $ = jQuery;
+
+		$("pre code").parent().each(function() {
+			if (!$(this).hasClass("prettyprint")) {
+				$(this).addClass("prettyprint").addClass("linenums");
+				a = true
+			}
+		});
+
+		if (a) {
+			prettyPrint()
+		}
+	}
+	$(function(){
+		styleCode();
+	})
+	
+</script>
 </head>
 
 <body>
-
     <div id="header">
-
         <div class="inside">
-
             <div id="search">
-
-                <form method="get" id="sform">
-
+                <form method="get" id="sform" action="/">
                     <div class="searchimg"></div>
-
-                    <input type="text" id="q" name="s" size="15" />
-
+                    <input type="text" id="q" name="keyword" size="15" />
                 </form>
-
             </div>
-
-            
-
             <h1><a href="/">Oo.xx</a></h1>
-
             <p class="description">On the way ...</p>
-
-
-
             <div class="clear"></div>
-
         </div>
-
     </div>
 
     <!-- [END] #header -->
 
-{% import markdown %}
     <div id="primary" class="single-post">
-
         <div class="inside" id="post-263">
-
-               <div class="primary">
-
-                   <h1>{{ escape(entry.title) }}</h1>
-                   {{ markdown.markdown(entry.text) }}
-                </div>
-
-            <hr class="hide" />
-
+	        <div class="primary">
+	            <h1>{{ escape(entry.title) }}</h1>
+	            <p><a href="/compose?id={{entry.cid}}">EDIT</a></p>
+	            {{ entry.html }}
+	        </div>
+	        <hr class="hide" />
         <div class="clear"></div>
-
         </div>
-
     </div>
 
     <!-- [END] #primary -->
 
-    
-
     <hr class="hide" />
-
     <div id="secondary">
-
         <div class="inside">
-
-            
-
-                            <div class="comment-head">
-
-                    <h2>{{ entry.commentsNum }} Comments</h2>
-
-                    <span class="details"><a href="#comment-form">Jump to comment form</a> | <a href="https://joyqi.com/feed/information-tech/use-comma-in-mysql-columns.html">comments feed</a> | <a href="https://joyqi.com/information-tech/use-comma-in-mysql-columns.html/trackback">trackback uri</a></span>
-
-                </div>
-
-                        
-
+            <div class="comment-head">
+                <h2>{{ entry.commentsNum }} Comments</h2>
+                <span class="details"><a href="#comment-form">Jump to comment form</a> | <a href="https://joyqi.com/feed/information-tech/use-comma-in-mysql-columns.html">comments feed</a> | <a href="https://joyqi.com/information-tech/use-comma-in-mysql-columns.html/trackback">trackback uri</a></span>
+            </div>
             <!-- You can start editing here. --> 
+		    <ol id="comments">
+		       {% for comment in comments %}   
+		       <li id="comment-{{ comment.coid }}"> 
+		            <cite> 
+		                <span class="author"><a href="{{ comment.url }}" rel="external nofollow">{{ comment.author }}</a> <img class="avatar" src="https://secure.gravatar.com/avatar/a35ca77e2c910b59497185282d53d55e?s=16&amp;r=X&amp;d=" alt="{{ comment.author }}" width="16" height="16" /></span> 
+		                <span class="date"><a href="#comment-{{ comment.coid }}" title="">{{ locale.format_date(comment.created, shorter=True) }}</a></span> 
+		            </cite> 
+		            <div class="content"> 
+		                <p>{{ comment.html }}</p>
+		            </div> 
+		            <div class="clear"></div> 
+		        </li>
+		        {% end %}
+		    </ol>
  
- 
-    <ol id="comments"> 
- 
-            <li class="alt" id="comment-8816"> 
-            <cite> 
-                <span class="author"><a href="http://blankyao.com" rel="external nofollow">blankyao</a> <img class="avatar" src="https://secure.gravatar.com/avatar/a35ca77e2c910b59497185282d53d55e?s=16&amp;r=X&amp;d=" alt="blankyao" width="16" height="16" /></span> 
-                <span class="date"><a href="#comment-8816" title="">February 23rd, 2011<br />15:48 CST</a></span> 
-            </cite> 
-            <div class="content"> 
-                <p>这个方法很帅气，曾经为tag这个东西很纠结</p>            </div> 
-            <div class="clear"></div> 
-        </li> 
- 
-            <li id="comment-8818"> 
-            <cite> 
-                <span class="author"><a href="http://www.bct99.com" rel="external nofollow">鸿枫业</a> <img class="avatar" src="https://secure.gravatar.com/avatar/040feaf3d979c68463b214fcdf7bfb1f?s=16&amp;r=X&amp;d=" alt="鸿枫业" width="16" height="16" /></span> 
-                <span class="date"><a href="#comment-8818" title="">February 25th, 2011<br />16:54 CST</a></span> 
-            </cite> 
-            <div class="content"> 
-                <p>准备使用Typecho，可是能不能做个WAP插件呢？</p>           </div> 
-            <div class="clear"></div> 
-        </li> 
- 
-            <li class="alt" id="comment-8823"> 
-            <cite> 
-                <span class="author"><a href="http://mr.mayday.net.cn" rel="external nofollow">王道中强流</a> <img class="avatar" src="https://secure.gravatar.com/avatar/9fa95974659a2ff154fe772a482f0e82?s=16&amp;r=X&amp;d=" alt="王道中强流" width="16" height="16" /></span> 
-                <span class="date"><a href="#comment-8823" title="">May 10th, 2011<br />10:25 CST</a></span> 
-            </cite> 
-            <div class="content"> 
-                <p>哈哈 吸收了</p>           </div> 
-            <div class="clear"></div> 
-        </li> 
- 
-            <li id="comment-8824"> 
-            <cite> 
-                <span class="author"><a href="http://arvixes.com" rel="external nofollow">arvixe</a> <img class="avatar" src="https://secure.gravatar.com/avatar/b328e32056393f1e5705eb4b91dd4b40?s=16&amp;r=X&amp;d=" alt="arvixe" width="16" height="16" /></span> 
-                <span class="date"><a href="#comment-8824" title="">May 27th, 2011<br />11:43 CST</a></span> 
-            </cite> 
-            <div class="content"> 
-                <p>博主用的是typecho？正想转过来呢，正在纠结中！</p>           </div> 
-            <div class="clear"></div> 
-        </li> 
- 
-            <li class="alt" id="comment-8832"> 
-            <cite> 
-                <span class="author"><a href="http://www.huntist.cn" rel="external nofollow">城主</a> <img class="avatar" src="https://secure.gravatar.com/avatar/26271b26699f11dbe032dc840f6bed01?s=16&amp;r=X&amp;d=" alt="城主" width="16" height="16" /></span> 
-                <span class="date"><a href="#comment-8832" title="">June 26th, 2011<br />17:04 CST</a></span> 
-            </cite> 
-            <div class="content"> 
-                <p>SF的投票功能（好问题，坏问题）是不是就是这样实现的呢？现在很蛋疼这个，如果用关系表的话来来回回查询花费的确会有点大。</p>          </div> 
-            <div class="clear"></div> 
-        </li> 
- 
-            <li id="comment-8835"> 
-            <cite> 
-                <span class="author"><a href="http://joyqi.com" rel="external nofollow">混蛋70</a> <img class="avatar" src="https://secure.gravatar.com/avatar/8a8304a40ec366197242d3ea3e31baf9?s=16&amp;r=X&amp;d=" alt="混蛋70" width="16" height="16" /></span> 
-                <span class="date"><a href="#comment-8835" title="">July 1st, 2011<br />12:21 CST</a></span> 
-            </cite> 
-            <div class="content"> 
-                <p>sf的mysql只做基础存储，所有查询都是通过搜索引擎完成的</p>           </div> 
-            <div class="clear"></div> 
-        </li> 
- 
-            <li class="alt" id="comment-8850"> 
-            <cite> 
-                <span class="author"><a href="http://bieku.org" rel="external nofollow">crl</a> <img class="avatar" src="https://secure.gravatar.com/avatar/55071f6d1fe841a1256c98168031c21a?s=16&amp;r=X&amp;d=" alt="crl" width="16" height="16" /></span> 
-                <span class="date"><a href="#comment-8850" title="">July 31st, 2011<br />14:51 CST</a></span> 
-            </cite> 
-            <div class="content"> 
-                <p>70兄，这算不算bug啊?<br /> 
-http://forum.typecho.org/topic.php?id=2009</p>          </div> 
-            <div class="clear"></div> 
-        </li> 
- 
-            <li id="comment-8855"> 
-            <cite> 
-                <span class="author">阿债 <img class="avatar" src="https://secure.gravatar.com/avatar/f862e659f3a6230bec7c5b9948d130f0?s=16&amp;r=X&amp;d=" alt="阿债" width="16" height="16" /></span> 
-                <span class="date"><a href="#comment-8855" title="">August 10th, 2011<br />11:36 CST</a></span> 
-            </cite> 
-            <div class="content"> 
-                <p>MySQL中不是Set类型吗，最多可以存储64个，转换为字符串的话，表现形式上也是逗号分割的，FIND_IN_SET原本就是给这种类型用的</p>            </div> 
-            <div class="clear"></div> 
-        </li> 
- 
-            <li class="alt" id="comment-8860"> 
-            <cite> 
-                <span class="author">aerotian <img class="avatar" src="https://secure.gravatar.com/avatar/fcaafc03725362731bddc2ffbd9762ae?s=16&amp;r=X&amp;d=" alt="aerotian" width="16" height="16" /></span> 
-                <span class="date"><a href="#comment-8860" title="">August 19th, 2011<br />0:39 CST</a></span> 
-            </cite> 
-            <div class="content"> 
-                <p>老大，typecho怎么样勒，我们等到花儿都谢了</p>         </div> 
-            <div class="clear"></div> 
-        </li> 
- 
-    
-    </ol> 
- 
- 
- 
- 
-        <div id="comment-form"> 
-            <h3 class="formhead">Have your say</h3> 
-            <p><small><strong>XHTML:</strong> You can use these tags: &lt;code&gt;&lt;blockquote&gt;</small></p> 
- 
-            <form action="https://joyqi.com/information-tech/use-comma-in-mysql-columns.html/comment" method="post" id="commentform"> 
-                            <input type="text" name="author" id="author" value="" class="textfield" tabindex="1" /><label for="author" class="text">Name (required)</label><br /> 
-            <input type="text" name="mail" id="mail" value="" class="textfield" tabindex="2" /><label for="mail" class="text">Email(required)</label><br /> 
-            <input type="text" name="url" id="url" value="" class="textfield" tabindex="3" /><label for="url" class="text">Website</label><br /> 
-                            
-            <textarea name="text" id="comment" class="commentbox" tabindex="4"></textarea> 
-            <div class="formactions"> 
-                <input type="submit" name="submit" tabindex="5" class="submit" value="Add your comment" /> 
-            </div> 
-            </form> 
-        </div> 
- 
-            
-
-                    </div>
-
+	        <div id="comment-form"> 
+	            <h3 class="formhead">Have your say</h3> 
+	            <p><small><strong>XHTML:</strong> You can use these tags: &lt;code&gt;&lt;blockquote&gt;</small></p> 
+	            <form action="https://joyqi.com/information-tech/use-comma-in-mysql-columns.html/comment" method="post" id="commentform"> 
+		            <input type="text" name="author" id="author" value="" class="textfield" tabindex="1" /><label for="author" class="text">Name (required)</label><br /> 
+		            <input type="text" name="mail" id="mail" value="" class="textfield" tabindex="2" /><label for="mail" class="text">Email(required)</label><br /> 
+		            <input type="text" name="url" id="url" value="" class="textfield" tabindex="3" /><label for="url" class="text">Website</label><br /> 
+	                <textarea name="text" id="comment" class="commentbox" tabindex="4"></textarea> 
+		            <div class="formactions"> 
+		                <input type="submit" name="submit" tabindex="5" class="submit" value="Add your comment" /> 
+		            </div> 
+	            </form> 
+	        </div>
+        </div>
     </div>
 
-    
-
-<hr class="hide" />
-
+    <hr class="hide" />
     <div id="ancillary">
-
         <div class="inside">
-
             <div class="block first">
-
-
-
                 <h2>About</h2>
-
-                                                <p>Name:祁宁(Qi Ning)<br /> 
-MSN:qining-china#hotmail.com<br /> 
-G-talk:magike.net#gmail.com</p><h2>Projects</h2><ul>
-
-<li><a href="http://code.google.com/p/magike">Magike</a></li>
-
-<li><a href="http://code.google.com/p/typecho">Typecho</a></li>
-
-<li><a href="https://joyqi.com/SciTePHPSuit">ScitePHPSuit</a></li>
-
-</ul>               
-
+                <p>Name:祁宁(Qi Ning)<br /> 
+                    MSN:qining-china#hotmail.com<br /> 
+                    G-talk:magike.net#gmail.com
+                </p>
+                <h2>Projects</h2>
+                <ul>
+                <li><a href="http://code.google.com/p/magike">Magike</a></li>
+                <li><a href="http://code.google.com/p/typecho">Typecho</a></li>
+                <li><a href="https://joyqi.com/SciTePHPSuit">ScitePHPSuit</a></li>
+                </ul>               
             </div>
-
-            
 
             <div class="block">
-
-
-
                 <h2>Recently</h2>
-
                 <ul class="dates">
-
-                                                            <li><a href="https://joyqi.com/information-tech/use-comma-in-mysql-columns.html"><span class="date">02.23</span> 在MySQL字段中使用逗号分隔符 </a></li>
-
-                                        <li><a href="https://joyqi.com/program/nginx-run-cgi.html"><span class="date">07.22</span> 在nginx上运行cgi程序 </a></li>
-
-                                        <li><a href="https://joyqi.com/information-tech/google-code-transmit-typecho.html"><span class="date">06.24</span> 为诸位离线控准备的Google Code同步插件 </a></li>
-
-                                        <li><a href="https://joyqi.com/picture-show/tamron-1750-test.html"><span class="date">05.21</span> 腾龙17-50(vc)试拍 </a></li>
-
-                                        <li><a href="https://joyqi.com/picture-show/243.html"><span class="date">04.30</span> 买了个相机 </a></li>
-
-                                        <li><a href="https://joyqi.com/funny-stuff/my-headphone.html"><span class="date">03.14</span> 我听过的耳机们 </a></li>
-
-                                        <li><a href="https://joyqi.com/life/heros-of-newearth.html"><span class="date">10.18</span> Heroes of Newerth,Dota迷不可错过的游戏 </a></li>
-
-                                        <li><a href="https://joyqi.com/life/move-to-mediatemple.html"><span class="date">10.14</span> 我们换到了MT </a></li>
-
-                                        <li><a href="https://joyqi.com/funny-stuff/action.html"><span class="date">06.17</span> scite-ru，无意中发现的奇葩 </a></li>
-
-                                        <li><a href="https://joyqi.com/life/some-books.html"><span class="date">06.08</span> 看了几本书 </a></li>
-
-                                    </ul>
-
-
-
+                {% for objen in recentlys %}
+                      <li><a href="/entry/{{ objen.slug }}" title="{{ escape(objen.title) }}"><span class="date">{{ locale.format_date(objen.created, shorter=True) }}</span> {{ escape(objen.title) }} </a></li>
+                {% end %}
+                </ul>
             </div>
-
-            
 
             <div class="block final">
-
                 <h2>Categories</h2>
-
                 <ul class="counts">
-
-                    <li><a href="https://joyqi.com/category/life/">精彩生活</a> (14)</li> 
-<li><a href="https://joyqi.com/category/funny-stuff/">有趣的玩意</a> (12)</li> 
-<li><a href="https://joyqi.com/category/information-tech/">信息技术探讨</a> (37)</li> 
-<li><a href="https://joyqi.com/category/beauty/">那些花儿</a> (9)</li> 
-<li><a href="https://joyqi.com/category/picture-show/">看图要说话 </a> (5)</li> 
-<li><a href="https://joyqi.com/category/program/">编程开发</a> (1)</li> 
+                    {% for objen in categorys %}
+                    <li><a href="/category/{{ objen.slug }}">{{ objen.name }}</a> ({{ objen.count }})</li> 
+                    {% end %}
                 </ul>
-
-
-
             </div>
-
-            
-
             <div class="clear"></div>
 
         </div>
@@ -308,25 +154,14 @@ G-talk:magike.net#gmail.com</p><h2>Projects</h2><ul>
 
     <!-- [END] #ancillary -->   
 
-
-
-<hr class="hide" />
-
+    <hr class="hide" />
     <div id="footer">
-
         <div class="inside">
-
-                        <p class="copyright"> Powered by <a href="http://warpspire.com/hemingway">Hemingway</a> <a href="http://notes.xiaoka.com/hemingway/">2.5</a> flavored <a href="http://typecho.org">Typecho</a>.</p>
-
+            <p class="copyright"> Powered by <a href="http://warpspire.com/hemingway">Hemingway</a> <a href="http://notes.xiaoka.com/hemingway/">2.5</a> flavored <a href="http://typecho.org">Typecho</a>.</p>
             <p class="attributes"><a href="feed:https://joyqi.com/feed/">Entries RSS</a> <a href="feed:https://joyqi.com/feed/comments/">Comments RSS</a></p>
-
         </div>
-
     </div>
-
     <!-- [END] #footer -->  
 
-
 </body>
-
 </html>
