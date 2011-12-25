@@ -5,7 +5,7 @@
     <title>MaDe Editor</title>
     <link rel="stylesheet" href="/static/mdeditor/css/preview.css" />
     <link rel="stylesheet" href="/static/mdeditor/css/style.css" />
-    <script type="text/javascript" src="/static/mdeditor/js/jquery.js"></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js" type="text/javascript"></script>
     <script type="text/javascript" src="/static/mdeditor/js/made.js"></script>
     <script type="text/javascript" src="/static/mdeditor/js/ace.js"></script>
     <script type="text/javascript" src="/static/mdeditor/js/mode-markdown.js"></script>
@@ -33,11 +33,15 @@
 <body>
 <div id="bar">
     <form action="{{ request.path }}" method="post" class="compose">
-    <h1 id="title">MaDe 妈的 <span class="desc">An Editor for markdown</span>
+    <h1 id="title">MaDe <span class="desc"><select name="mid">
+    {% for category in categorys %}
+        <option value="{{ category.mid }}" {% if entry and entry.mid == category.mid %}selected{%end%}>{{category.name}}</option>
+    {% end %}
+    </select></span>
     <span><input name="title" type="text" size="80" class="title" value="{{ escape(entry.title) if entry else "" }}"/></span>
     <span><input type="submit" value="{{ _("Save changes") if entry else _("Publish post") }}" class="submit"/>&nbsp;&nbsp;&nbsp;&nbsp;<a href="{{ "/entry/" + entry.slug if entry else "/" }}" style="font-size:10px;">{{ _("Cancel") }}</a></span>
     </h1>
-    <textarea id="markdownarea" name="markdown" rows="30" cols="80" class="markdown" style="display:none">{{ escape(entry.markdown) if entry else "" }}</textarea>
+    <textarea id="markdownarea" name="markdown" rows="30" cols="80" class="markdown" style="display:none">{% if entry %}{{ escape(entry.markdown) if entry.markdown else escape(entry.html)}}{% end %}</textarea>
     {% if entry %}
       <input type="hidden" name="id" value="{{ entry.cid }}"/>
     {% end %}

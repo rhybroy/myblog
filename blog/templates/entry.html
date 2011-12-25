@@ -30,6 +30,13 @@
 				a = true
 			}
 		});
+		
+		$("pre").each(function() {
+            if (!$(this).hasClass("prettyprint")) {
+                $(this).addClass("prettyprint").addClass("linenums");
+                a = true
+            }
+        });
 
 		if (a) {
 			prettyPrint()

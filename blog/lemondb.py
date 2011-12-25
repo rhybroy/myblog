@@ -58,6 +58,16 @@ class LemonDB(object):
 		else:
 			return rows[0]
 		
+	def getint(self, query, *parameters):
+		"""Returns the first row returned for the given query."""
+		cursor = self._excursor()
+		try:
+			self._execute(cursor, query, parameters)
+			for row in cursor:
+				return row[0]
+		finally:
+			self.close()
+		
 	def checkExist(self, query, *parameters):
 		"""Returns the first row returned for the given query."""
 		rows = self.query(query, *parameters)
@@ -135,10 +145,9 @@ class Row(dict):
 
 if __name__ == '__main__':
 	#db = connect("sqlite", db="e:/sqlite/blog.db")
-	db = connect("mysql", host="localhost", user="root", passwd="", db="news")
-	db2 = connect("mysql", host="211.144.137.66", user="lemon", passwd="lemon001)(", db="wp")
+	db = connect("mysql", host="localhost", user="root", passwd="", db="blog")
 	
-	result = db2.get("select count(*) from wp_posts")
+	result = db.getint("select count(*) from typecho_contents")
 	print result
 	#result = db.execute("insert into entries(id, title) values(%s, %s)", 5, 'test');
 	#print result

@@ -1,24 +1,20 @@
 #!/usr/bin/env python
 
 import os.path
-import re
 import tornado.auth
-#import tornado.database
 import tornado.httpserver
 import tornado.ioloop
-import tornado.options
 import tornado.web
-import unicodedata
+from tornado.options import define, options, parse_command_line
+
 import urllib
 import lemondb
 import markdown2
-from tornado.options import define, options
 
-define("port", default=8888, help="run on the given port", type=int)
-define("mysql_host", default="127.0.0.1:3306", help="blog database host")
-define("mysql_database", default="blog", help="blog database name")
-define("mysql_user", default="blog", help="blog database user")
-define("mysql_password", default="blog", help="blog database password")
+import admin
+
+import settings
+
 
 
 class Application(tornado.web.Application):
@@ -33,9 +29,10 @@ class Application(tornado.web.Application):
 			(r"/search/([^/]+)/(\d+)?/?", SearchHandler),
 			(r"/entry/([^/]+)", EntryHandler),
 			(r"/feed", FeedHandler),
-			(r"/compose", ComposeHandler),
-			(r"/auth/login", AuthLoginHandler),
-			(r"/auth/logout", AuthLogoutHandler),
+			(r"/compose", admin.ComposeHandler),
+			(r"/admin/list", admin.ListHandler),
+			(r"/auth/login", admin.AuthLoginHandler),
+			(r"/auth/logout", admin.AuthLogoutHandler),
 		]
 		settings = dict(
 			blog_title=u"Tornado Blog",
@@ -57,8 +54,10 @@ class BaseHandler(tornado.web.RequestHandler):
 
 	def get_current_user(self):
 		user_id = self.get_secure_cookie("user")
+		print user_id
 		if not user_id: return None
-		return self.db.get("SELECT * FROM authors WHERE id = %s", int(user_id))
+		return self.db.get("SELECT * FROM typecho_users WHERE name = %s", str(user_id))
+		
 
 
 class HomeHandler(BaseHandler):
@@ -78,12 +77,12 @@ class HomeHandler(BaseHandler):
 		categorys = self.db.query("select * from typecho_metas where type='category' order by `order`")
 		recentlys = self.db.query("select title, slug, created from typecho_contents order by created desc limit 10")
 		
-		self.render("index.html", autoescape=None, entries=entries, nextpage=page+1, prepage=page-1, pagetype="page", categorys=categorys, recentlys=recentlys)
+		self.render("index.html", entries=entries, nextpage=page+1, prepage=page-1, pagetype="page", categorys=categorys, recentlys=recentlys)
 
 
 class EntryHandler(BaseHandler):
 	def get(self, slug):
-		slug = urllib.quote(slug)
+		slug = urllib.quote(slug).lower().strip()
 		entry = self.db.get("SELECT * FROM typecho_contents WHERE slug = %s and status = 'publish'", slug)
 		if not entry: 
 			raise tornado.web.HTTPError(404)
@@ -93,12 +92,12 @@ class EntryHandler(BaseHandler):
 		categorys = self.db.query("select * from typecho_metas where type='category' order by `order`")
 		recentlys = self.db.query("select title, slug, created from typecho_contents order by created desc limit 10")
 		
-		self.render("entry.html", entry=entry, comments=comments, autoescape=None, categorys=categorys, recentlys=recentlys)
+		self.render("entry.html", entry=entry, comments=comments, categorys=categorys, recentlys=recentlys)
 
 
 class CategoryHandler(BaseHandler):
 	def get(self, slug, page=1):
-		slug = urllib.quote(slug)
+		slug = urllib.quote(slug).lower().strip()
 		mid = self.db.get("select mid from typecho_metas where slug = %s", slug).mid
 		pagesize = 2
 		page = int(page)
@@ -133,78 +132,6 @@ class FeedHandler(BaseHandler):
 		self.set_header("Content-Type", "application/atom+xml")
 		self.render("feed.xml", entries=entries)
 
-
-class ComposeHandler(BaseHandler):
-	def get(self):
-		id = self.get_argument("id", None)
-		entry = None
-		if id:
-			entry = self.db.get("SELECT * FROM typecho_contents WHERE cid = %s", int(id))
-		self.render("editor.html", entry=entry)
-
-	def post(self):
-		id = self.get_argument("id", None)
-		title = self.get_argument("title")
-		text = self.get_argument("markdown")
-		html = markdown2.markdown(text)
-		if id:
-			entryBL = self.db.checkExist("SELECT cid FROM typecho_contents WHERE cid = %s", int(id))
-			if not entryBL: 
-				raise tornado.web.HTTPError(404)
-			slug = urllib.quote_plus(title.encode("utf-8")).lower().strip()
-			self.db.execute(
-				"UPDATE typecho_contents SET title = %s, slug = %s, markdown = %s, html = %s, modified=now() "
-				"WHERE cid = %s", title, slug, text, html, int(id))
-		else:
-			slug = urllib.quote_plus(title.encode("utf-8")).lower().strip()
-			
-			if not slug: 
-				slug = "entry"
-			while True:
-				e = self.db.get("SELECT * FROM typecho_contents WHERE slug = %s", slug)
-				if not e: 
-					break
-				slug += "-2"
-			self.db.execute(
-				"INSERT INTO typecho_contents (authorId,title,slug,markdown,html,"
-				"created) VALUES (%s,%s,%s,%s,%s,now())",
-				1, title, slug, text, html)
-		self.redirect("/entry/" + slug)
-
-
-class AuthLoginHandler(BaseHandler, tornado.auth.GoogleMixin):
-	@tornado.web.asynchronous
-	def get(self):
-		if self.get_argument("openid.mode", None):
-			self.get_authenticated_user(self.async_callback(self._on_auth))
-			return
-		self.authenticate_redirect()
-	
-	def _on_auth(self, user):
-		if not user:
-			raise tornado.web.HTTPError(500, "Google auth failed")
-		author = self.db.get("SELECT * FROM authors WHERE email = %s",
-							 user["email"])
-		if not author:
-			# Auto-create first author
-			any_author = self.db.get("SELECT * FROM authors LIMIT 1")
-			if not any_author:
-				author_id = self.db.execute(
-					"INSERT INTO authors (email,name) VALUES (%s,%s)",
-					user["email"], user["name"])
-			else:
-				self.redirect("/")
-				return
-		else:
-			author_id = author["id"]
-		self.set_secure_cookie("user", str(author_id))
-		self.redirect(self.get_argument("next", "/"))
-
-
-class AuthLogoutHandler(BaseHandler):
-	def get(self):
-		self.clear_cookie("user")
-		self.redirect(self.get_argument("next", "/"))
 
 
 class EntryModule(tornado.web.UIModule):
